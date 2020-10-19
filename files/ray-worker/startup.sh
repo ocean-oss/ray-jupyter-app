@@ -12,7 +12,7 @@ start.sh ray start \
   --block \
   --object-manager-port {{ engines.ray-worker.vars.ray_object_manager_port }} \
   --node-manager-port {{ engines.ray-worker.vars.ray_node_manager_port }} \
-  --num-cpus {{ engines.ray-worker.deployment.hardware.cpus }} \
+  --num-cpus {{ engines.ray-worker.deployment.hardware.cpu.vcpus }} \
   --num-gpus {{ engines.ray-worker.deployment.hardware.gpus }} \
   --min-worker-port 11000 \
   --max-worker-port 12000 \

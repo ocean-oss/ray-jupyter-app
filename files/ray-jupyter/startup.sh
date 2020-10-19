@@ -12,7 +12,7 @@ start.sh ray start \
   --include-dashboard true \
   --dashboard-port {{ engines.ray-jupyter.vars.ray_dashboard_port }} \
   --dashboard-host 0.0.0.0 \
-  --num-cpus {{ engines.ray-jupyter.deployment.hardware.cpus }} \
+  --num-cpus {{ engines.ray-jupyter.deployment.hardware.cpu.vcpus }} \
   --num-gpus {{ engines.ray-jupyter.deployment.hardware.gpus }} \
   --min-worker-port 11000 \
   --max-worker-port 12000 \
