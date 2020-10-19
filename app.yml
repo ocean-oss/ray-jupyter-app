@@ -8,19 +8,19 @@ steps:
           - name: ray_head_host
             value: "{{ engines.ray-jupyter.deployment.nodes.main.private_ip }}"
           - name: ray_head_port
-            value: reserve_port()
+            value: "{% reserve_public_port %}"
           - name: ray_dashboard_port
-            value: reserve_port()
+            value: "{% reserve_public_port %}"
           - name: ray_node_manager_port
-            value: reserve_port()
+            value: "{% reserve_public_port %}"
           - name: ray_object_manager_port
-            value: reserve_port()
+            value: "{% reserve_public_port %}"
           - name: gcs_server_port
-            value: reserve_port()
+            value: "{% reserve_public_port %}"
           - name: jupyter_port
-            value: reserve_port()
+            value: "{% reserve_public_port %}"
           - name: jupyter_token
-            value: generate_uuid()
+            value: "{% generate_uuid %}"
         orchestrator:
           type: Orchestrator::MainWithWorkers
           deploy_to_main: true
@@ -68,11 +68,11 @@ steps:
       - name: ray-worker
         vars:
           - name: ray_node_manager_port
-            value: reserve_port()
+            value: "{% reserve_public_port %}"
           - name: ray_object_manager_port
-            value: reserve_port()
+            value: "{% reserve_public_port %}"
           - name: gcs_server_port
-            value: reserve_port()
+            value: "{% reserve_public_port %}"
         orchestrator:
           type: Orchestrator::MainWithWorkers
           deploy_to_main: false
