@@ -13,7 +13,7 @@ steps:
           - name: ray_head_host
             value: "{{ engines.ray-jupyter.deployment.nodes.main.private_ip }}"
           - name: ray_head_port
-            value: "{% reserve_public_port %}"
+            value: "{% reserve_private_port %}"
           - name: ray_dashboard_port
             value: "{% reserve_public_port %}"
           - name: ray_node_manager_port
@@ -66,11 +66,11 @@ steps:
       - name: ray-worker
         vars:
           - name: ray_node_manager_port
-            value: "{% reserve_public_port %}"
+            value: "{% reserve_private_port %}"
           - name: ray_object_manager_port
-            value: "{% reserve_public_port %}"
+            value: "{% reserve_private_port %}"
           - name: gcs_server_port
-            value: "{% reserve_public_port %}"
+            value: "{% reserve_private_port %}"
         orchestrator:
           deployment_strategy: workers_fill_pool
           snapshot_name: ray
