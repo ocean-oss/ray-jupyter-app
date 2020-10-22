@@ -1,6 +1,11 @@
 ---
 ocean:
   version: "1"
+snapshots:
+  - name: ray
+    registry: docker_hub
+    image: getocean/ray-notebook
+    tag: latest
 steps:
   - engines:
       - name: ray-jupyter
@@ -12,25 +17,18 @@ steps:
           - name: ray_dashboard_port
             value: "{% reserve_public_port %}"
           - name: ray_node_manager_port
-            value: "{% reserve_public_port %}"
+            value: "{% reserve_private_port %}"
           - name: ray_object_manager_port
-            value: "{% reserve_public_port %}"
+            value: "{% reserve_private_port %}"
           - name: gcs_server_port
-            value: "{% reserve_public_port %}"
+            value: "{% reserve_private_port %}"
           - name: jupyter_port
             value: "{% reserve_public_port %}"
           - name: jupyter_token
             value: "{% generate_uuid %}"
         orchestrator:
-          type: Orchestrator::MainWithWorkers
-          deploy_to_main: true
-          deploy_to_workers: false
-          snapshot:
-            registry:
-              name: docker_hub
-            image:
-              name: getocean/ray-notebook
-            name: latest
+          deployment_strategy: main
+          snapshot_name: ray
           container:
             user: root
             workdir: /work
@@ -43,17 +41,17 @@ steps:
                 command: "{{ engines.ray-jupyter.orchestrator.container.mounts.engine }}/startup.sh"
                 env_vars:
                   - name: JUPYTER_ENABLE_LAB
-                    value: yes
+                    value: "yes"
                   - name: NB_UID
                     value: "{{ workspace.user.uid }}"
                   - name: NB_GID
                     value: "{{ workspace.user.gid }}"
                   - name: CHOWN_HOME
-                    value: yes
+                    value: "yes"
                   - name: GRANT_SUDO
-                    value: yes
+                    value: "yes"
                   - name: RESTARTABLE
-                    value: yes
+                    value: "yes"
                   - name: RAY_ADDRESS
                     value: "{{ engines.ray-jupyter.vars.ray_head_host }}:{{ engines.ray-jupyter.vars.ray_head_port }}"
         ui:
@@ -74,15 +72,8 @@ steps:
           - name: gcs_server_port
             value: "{% reserve_public_port %}"
         orchestrator:
-          type: Orchestrator::MainWithWorkers
-          deploy_to_main: false
-          deploy_to_workers: true
-          snapshot:
-            registry:
-              name: docker_hub
-            image:
-              name: getocean/ray-notebook
-            name: latest
+          deployment_strategy: workers_fill_pool
+          snapshot_name: ray
           container:
             user: root
             workdir: /work
@@ -99,4 +90,4 @@ steps:
                   - name: NB_GID
                     value: "{{ workspace.user.gid }}"
                   - name: CHOWN_HOME
-                    value: yes
+                    value: 'yes'
