@@ -83,8 +83,8 @@ steps:
             workdir: /work
             mounts:
               files:
-                - name: ray_jupyter
-                  app_path: ray_jupyter
+                - name: ray_worker
+                  app_path: ray_worker
                   container_path: /ocean/etc/ray_worker
                   readonly: true
               data_stores: "{{ engines.ray_worker.orchestrator.container.workdir }}"
