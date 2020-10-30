@@ -33,16 +33,16 @@ steps:
             user: root
             workdir: /work
             mounts:
-              files:
+              app_files:
                 - name: ray_jupyter
-                  app_path: ray_jupyter
+                  app_files_path: ray_jupyter
                   container_path: /ocean/etc/ray_jupyter
                   readonly: true
               data_stores: "{{ engines.ray_jupyter.orchestrator.container.workdir }}"
               ssh: "/home/{{ workspace.user.name }}/.ssh"
             nodes:
               main:
-                command: "{{ engines.ray_jupyter.orchestrator.container.mounts.files.ray_jupyter.container_path }}/startup.sh"
+                command: "{{ engines.ray_jupyter.orchestrator.container.mounts.app_files.ray_jupyter.container_path }}/startup.sh"
                 env_vars:
                   - name: JUPYTER_ENABLE_LAB
                     value: "yes"
@@ -82,16 +82,16 @@ steps:
             user: root
             workdir: /work
             mounts:
-              files:
+              app_files:
                 - name: ray_worker
-                  app_path: ray_worker
+                  app_files_path: ray_worker
                   container_path: /ocean/etc/ray_worker
                   readonly: true
               data_stores: "{{ engines.ray_worker.orchestrator.container.workdir }}"
               ssh: "/home/{{ workspace.user.name }}/.ssh"
             nodes:
               worker:
-                command: "{{ engines.ray_worker.orchestrator.container.mounts.files.ray_worker.container_path }}/startup.sh"
+                command: "{{ engines.ray_worker.orchestrator.container.mounts.app_files.ray_worker.container_path }}/startup.sh"
                 env_vars:
                   - name: NB_UID
                     value: "{{ workspace.user.uid }}"
