@@ -8,10 +8,10 @@ snapshots:
     tag: latest
 steps:
   - engines:
-      - name: ray-jupyter
+      - name: ray_jupyter
         vars:
           - name: ray_head_host
-            value: "{{ engines.ray-jupyter.deployment.nodes.main.private_ip }}"
+            value: "{{ engines.ray_jupyter.deployment.nodes.main.private_ip }}"
           - name: ray_head_port
             value: "{% reserve_private_port %}"
           - name: ray_dashboard_port
@@ -33,12 +33,16 @@ steps:
             user: root
             workdir: /work
             mounts:
-              engine: /etc/ocean
-              data_stores: "{{ engines.ray-jupyter.orchestrator.container.workdir }}"
+              files:
+                - name: ray_jupyter
+                  app_path: ray_jupyter
+                  container_path: /ocean/etc/ray_jupyter
+                  readonly: true
+              data_stores: "{{ engines.ray_jupyter.orchestrator.container.workdir }}"
               ssh: "/home/{{ workspace.user.name }}/.ssh"
             nodes:
               main:
-                command: "{{ engines.ray-jupyter.orchestrator.container.mounts.engine }}/startup.sh"
+                command: "{{ engines.ray_jupyter.orchestrator.container.mounts.files.ray_jupyter.container_path }}/startup.sh"
                 env_vars:
                   - name: JUPYTER_ENABLE_LAB
                     value: "yes"
@@ -53,17 +57,17 @@ steps:
                   - name: RESTARTABLE
                     value: "yes"
                   - name: RAY_ADDRESS
-                    value: "{{ engines.ray-jupyter.vars.ray_head_host }}:{{ engines.ray-jupyter.vars.ray_head_port }}"
+                    value: "{{ engines.ray_jupyter.vars.ray_head_host }}:{{ engines.ray_jupyter.vars.ray_head_port }}"
         ui:
           buttons:
             - node_target: main
               label: Ray Dashboard
-              url: "http://{{ engines.ray-jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray-jupyter.vars.ray_dashboard_port }}"
+              url: "http://{{ engines.ray_jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray_jupyter.vars.ray_dashboard_port }}"
             - node_target: main
               label: Jupyter Notebook
-              url: "http://{{ engines.ray-jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray-jupyter.vars.jupyter_port }}?token={{ engines.ray-jupyter.vars.jupyter_token }}"
+              url: "http://{{ engines.ray_jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray_jupyter.vars.jupyter_port }}?token={{ engines.ray_jupyter.vars.jupyter_token }}"
   - engines:
-      - name: ray-worker
+      - name: ray_worker
         vars:
           - name: ray_node_manager_port
             value: "{% reserve_private_port %}"
@@ -78,12 +82,16 @@ steps:
             user: root
             workdir: /work
             mounts:
-              engine: /etc/ocean
-              data_stores: "{{ engines.ray-worker.orchestrator.container.workdir }}"
+              files:
+                - name: ray_jupyter
+                  app_path: ray_jupyter
+                  container_path: /ocean/etc/ray_worker
+                  readonly: true
+              data_stores: "{{ engines.ray_worker.orchestrator.container.workdir }}"
               ssh: "/home/{{ workspace.user.name }}/.ssh"
             nodes:
               worker:
-                command: "{{ engines.ray-worker.orchestrator.container.mounts.engine }}/startup.sh"
+                command: "{{ engines.ray_worker.orchestrator.container.mounts.files.ray_worker.container_path }}/startup.sh"
                 env_vars:
                   - name: NB_UID
                     value: "{{ workspace.user.uid }}"
