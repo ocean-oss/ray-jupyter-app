@@ -76,7 +76,7 @@ steps:
           - name: gcs_server_port
             value: "{% reserve_private_port %}"
         orchestrator:
-          deployment_strategy: workers_fill_pool
+          deployment_strategy: workers_fill_pool_if_available
           snapshot_name: ray
           container:
             user: root
