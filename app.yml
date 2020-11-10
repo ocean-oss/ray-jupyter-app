@@ -39,32 +39,27 @@ steps:
                   container_path: /ocean/etc/ray_jupyter
                   readonly: true
               data_stores: "{{ engines.ray_jupyter.orchestrator.container.workdir }}"
-              ssh: "/home/{{ workspace.user.name }}/.ssh"
-            nodes:
-              main:
-                command: "{{ engines.ray_jupyter.orchestrator.container.mounts.app_files.ray_jupyter.container_path }}/startup.sh"
-                env_vars:
-                  - name: JUPYTER_ENABLE_LAB
-                    value: "yes"
-                  - name: NB_UID
-                    value: "{{ workspace.user.uid }}"
-                  - name: NB_GID
-                    value: "{{ workspace.user.gid }}"
-                  - name: CHOWN_HOME
-                    value: "yes"
-                  - name: GRANT_SUDO
-                    value: "yes"
-                  - name: RESTARTABLE
-                    value: "yes"
-                  - name: RAY_ADDRESS
-                    value: "{{ engines.ray_jupyter.vars.ray_head_host }}:{{ engines.ray_jupyter.vars.ray_head_port }}"
+            command: "{{ engines.ray_jupyter.orchestrator.container.mounts.app_files.ray_jupyter.container_path }}/startup.sh"
+            env_vars:
+              - name: JUPYTER_ENABLE_LAB
+                value: "yes"
+              - name: NB_UID
+                value: "{{ workspace.user.uid }}"
+              - name: NB_GID
+                value: "{{ workspace.user.gid }}"
+              - name: CHOWN_HOME
+                value: "yes"
+              - name: GRANT_SUDO
+                value: "yes"
+              - name: RESTARTABLE
+                value: "yes"
+              - name: RAY_ADDRESS
+                value: "{{ engines.ray_jupyter.vars.ray_head_host }}:{{ engines.ray_jupyter.vars.ray_head_port }}"
         ui:
           buttons:
-            - node_target: main
-              label: Ray Dashboard
+            - label: Ray Dashboard
               url: "http://{{ engines.ray_jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray_jupyter.vars.ray_dashboard_port }}"
-            - node_target: main
-              label: Jupyter Notebook
+            - label: Jupyter Notebook
               url: "http://{{ engines.ray_jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray_jupyter.vars.jupyter_port }}?token={{ engines.ray_jupyter.vars.jupyter_token }}"
   - engines:
       - name: ray_worker
@@ -88,14 +83,11 @@ steps:
                   container_path: /ocean/etc/ray_worker
                   readonly: true
               data_stores: "{{ engines.ray_worker.orchestrator.container.workdir }}"
-              ssh: "/home/{{ workspace.user.name }}/.ssh"
-            nodes:
-              worker:
-                command: "{{ engines.ray_worker.orchestrator.container.mounts.app_files.ray_worker.container_path }}/startup.sh"
-                env_vars:
-                  - name: NB_UID
-                    value: "{{ workspace.user.uid }}"
-                  - name: NB_GID
-                    value: "{{ workspace.user.gid }}"
-                  - name: CHOWN_HOME
-                    value: 'yes'
+            command: "{{ engines.ray_worker.orchestrator.container.mounts.app_files.ray_worker.container_path }}/startup.sh"
+            env_vars:
+              - name: NB_UID
+                value: "{{ workspace.user.uid }}"
+              - name: NB_GID
+                value: "{{ workspace.user.gid }}"
+              - name: CHOWN_HOME
+                value: 'yes'
