@@ -7,11 +7,11 @@ set -e
 sleep 5
 
 start.sh ray start \
-  --address {{ engines.ray_jupyter.vars.ray_head_host }}:{{ engines.ray_jupyter.ports.ray_head_port.value }} \
+  --address {{ engines.ray_jupyter.vars.ray_head_host }}:{{ engines.ray_jupyter.networking.ports.ray_head_port.value }} \
   --node-ip-address $(hostname -I) \
   --block \
-  --object-manager-port {{ engines.ray_worker.ports.ray_object_manager_port.value }} \
-  --node-manager-port {{ engines.ray_worker.ports.ray_node_manager_port.value }} \
+  --object-manager-port {{ engines.ray_worker.networking.ports.ray_object_manager_port.value }} \
+  --node-manager-port {{ engines.ray_worker.networking.ports.ray_node_manager_port.value }} \
   --num-cpus {{ engines.ray_worker.deployment.hardware.cpu.vcpus }} \
   --num-gpus {{ engines.ray_worker.deployment.hardware.gpus }} \
   --min-worker-port 11000 \
