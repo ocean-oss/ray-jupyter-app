@@ -16,6 +16,10 @@ steps:
           - name: jupyter_token
             value: "{% generate_uuid %}"
         networking:
+          dns:
+            enabled: true
+            default_value: ray
+            label: Ray/Jupyter URL
           ports:
             - name: ray_head_port
               public: false
@@ -61,9 +65,9 @@ steps:
         ui:
           buttons:
             - label: Ray Dashboard
-              url: "http://{{ engines.ray_jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray_jupyter.networking.ports.ray_dashboard_port.value }}"
+              url: "http://{{ engines.ray_jupyter.networking.dns.url }}:{{ engines.ray_jupyter.networking.ports.ray_dashboard_port.value }}"
             - label: Jupyter Notebook
-              url: "http://{{ engines.ray_jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray_jupyter.networking.ports.jupyter_port.value }}?token={{ engines.ray_jupyter.vars.jupyter_token }}"
+              url: "http://{{ engines.ray_jupyter.networking.dns.url }}:{{ engines.ray_jupyter.networking.ports.jupyter_port.value }}?token={{ engines.ray_jupyter.vars.jupyter_token }}"
   - engines:
       - name: ray_worker
         networking:
