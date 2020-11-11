@@ -13,20 +13,21 @@ steps:
         vars:
           - name: ray_head_host
             value: "{{ engines.ray_jupyter.deployment.nodes.main.private_ip }}"
-          - name: ray_head_port
-            value: "{% reserve_private_port %}"
-          - name: ray_dashboard_port
-            value: "{% reserve_public_port %}"
-          - name: ray_node_manager_port
-            value: "{% reserve_private_port %}"
-          - name: ray_object_manager_port
-            value: "{% reserve_private_port %}"
-          - name: gcs_server_port
-            value: "{% reserve_private_port %}"
-          - name: jupyter_port
-            value: "{% reserve_public_port %}"
           - name: jupyter_token
             value: "{% generate_uuid %}"
+        ports:
+          - name: ray_head_port
+            public: false
+          - name: ray_dashboard_port
+            public: true
+          - name: ray_node_manager_port
+            public: false
+          - name: ray_object_manager_port
+            public: false
+          - name: gcs_server_port
+            public: false
+          - name: jupyter_port
+            public: true
         deployment:
           strategy: main
         container:
@@ -55,22 +56,20 @@ steps:
             - name: RESTARTABLE
               value: "yes"
             - name: RAY_ADDRESS
-              value: "{{ engines.ray_jupyter.vars.ray_head_host }}:{{ engines.ray_jupyter.vars.ray_head_port }}"
+              value: "{{ engines.ray_jupyter.vars.ray_head_host }}:{{ engines.ray_jupyter.ports.ray_head_port.value }}"
         ui:
           buttons:
             - label: Ray Dashboard
-              url: "http://{{ engines.ray_jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray_jupyter.vars.ray_dashboard_port }}"
+              url: "http://{{ engines.ray_jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray_jupyter.ports.ray_dashboard_port.value }}"
             - label: Jupyter Notebook
-              url: "http://{{ engines.ray_jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray_jupyter.vars.jupyter_port }}?token={{ engines.ray_jupyter.vars.jupyter_token }}"
+              url: "http://{{ engines.ray_jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray_jupyter.ports.jupyter_port.value }}?token={{ engines.ray_jupyter.vars.jupyter_token }}"
   - engines:
       - name: ray_worker
-        vars:
+        ports:
           - name: ray_node_manager_port
-            value: "{% reserve_private_port %}"
+            public: false
           - name: ray_object_manager_port
-            value: "{% reserve_private_port %}"
-          - name: gcs_server_port
-            value: "{% reserve_private_port %}"
+            public: false
         deployment:
           strategy: workers_fill_pool_if_available
         container:
