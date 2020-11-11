@@ -9,91 +9,91 @@ images:
     snapshottable: true
 steps:
   - engines:
-      - name: ray_jupyter
-        vars:
-          - name: ray_head_host
-            value: "{{ engines.ray_jupyter.deployment.nodes.main.private_ip }}"
-          - name: jupyter_token
-            value: "{% generate_uuid %}"
-        networking:
-          dns:
-            enabled: true
-            default_value: ray
-            label: Ray/Jupyter URL
-          ports:
-            - name: ray_head
-              public: false
-            - name: ray_dashboard
-              public: true
-            - name: ray_node_manager
-              public: false
-            - name: ray_object_manager
-              public: false
-            - name: gcs_server
-              public: false
-            - name: jupyter
-              public: true
-        deployment:
-          strategy: main
-        container:
-          image_name: ray
-          user: root
-          workdir: /work
-          mounts:
-            app_files:
-              - name: ray_jupyter
-                app_files_path: ray_jupyter
-                container_path: /ocean/etc/ray_jupyter
-                readonly: true
-            data_stores: "{{ engines.ray_jupyter.container.workdir }}"
-          command: "{{ engines.ray_jupyter.container.mounts.app_files.ray_jupyter.container_path }}/startup.sh"
-          env_vars:
-            - name: JUPYTER_ENABLE_LAB
-              value: "yes"
-            - name: NB_UID
-              value: "{{ workspace.user.uid }}"
-            - name: NB_GID
-              value: "{{ workspace.user.gid }}"
-            - name: CHOWN_HOME
-              value: "yes"
-            - name: GRANT_SUDO
-              value: "yes"
-            - name: RESTARTABLE
-              value: "yes"
-            - name: RAY_ADDRESS
-              value: "{{ engines.ray_jupyter.vars.ray_head_host }}:{{ engines.ray_jupyter.networking.ports.ray_head.value }}"
-        ui:
-          buttons:
-            - label: Ray Dashboard
-              url: "http://{{ engines.ray_jupyter.networking.dns.url }}:{{ engines.ray_jupyter.networking.ports.ray_dashboard.value }}"
-            - label: Jupyter Notebook
-              url: "http://{{ engines.ray_jupyter.networking.dns.url }}:{{ engines.ray_jupyter.networking.ports.jupyter.value }}?token={{ engines.ray_jupyter.vars.jupyter_token }}"
+    - name: ray_jupyter
+      vars:
+        - name: ray_head_host
+          value: "{{ engines.ray_jupyter.deployment.nodes.main.private_ip }}"
+        - name: jupyter_token
+          value: "{% generate_uuid %}"
+      networking:
+        dns:
+          enabled: true
+          default_value: ray
+          label: Ray/Jupyter URL
+        ports:
+          - name: ray_head
+            public: false
+          - name: ray_dashboard
+            public: true
+          - name: ray_node_manager
+            public: false
+          - name: ray_object_manager
+            public: false
+          - name: gcs_server
+            public: false
+          - name: jupyter
+            public: true
+      deployment:
+        strategy: main
+      container:
+        image_name: ray
+        user: root
+        workdir: /work
+        mounts:
+          app_files:
+            - name: ray_jupyter
+              app_files_path: ray_jupyter
+              container_path: /ocean/etc/ray_jupyter
+              readonly: true
+          data_stores: "{{ engines.ray_jupyter.container.workdir }}"
+        command: "{{ engines.ray_jupyter.container.mounts.app_files.ray_jupyter.container_path }}/startup.sh"
+        env_vars:
+          - name: JUPYTER_ENABLE_LAB
+            value: "yes"
+          - name: NB_UID
+            value: "{{ workspace.user.uid }}"
+          - name: NB_GID
+            value: "{{ workspace.user.gid }}"
+          - name: CHOWN_HOME
+            value: "yes"
+          - name: GRANT_SUDO
+            value: "yes"
+          - name: RESTARTABLE
+            value: "yes"
+          - name: RAY_ADDRESS
+            value: "{{ engines.ray_jupyter.vars.ray_head_host }}:{{ engines.ray_jupyter.networking.ports.ray_head.value }}"
+      ui:
+        buttons:
+          - label: Ray Dashboard
+            url: "http://{{ engines.ray_jupyter.networking.dns.url }}:{{ engines.ray_jupyter.networking.ports.ray_dashboard.value }}"
+          - label: Jupyter Notebook
+            url: "http://{{ engines.ray_jupyter.networking.dns.url }}:{{ engines.ray_jupyter.networking.ports.jupyter.value }}?token={{ engines.ray_jupyter.vars.jupyter_token }}"
   - engines:
-      - name: ray_worker
-        networking:
-          ports:
-            - name: ray_node_manager
-              public: false
-            - name: ray_object_manager
-              public: false
-        deployment:
-          strategy: workers_fill_pool_if_available
-        container:
-          image_name: ray
-          user: root
-          workdir: /work
-          mounts:
-            app_files:
-              - name: ray_worker
-                app_files_path: ray_worker
-                container_path: /ocean/etc/ray_worker
-                readonly: true
-            data_stores: "{{ engines.ray_worker.container.workdir }}"
-          command: "{{ engines.ray_worker.container.mounts.app_files.ray_worker.container_path }}/startup.sh"
-          env_vars:
-            - name: NB_UID
-              value: "{{ workspace.user.uid }}"
-            - name: NB_GID
-              value: "{{ workspace.user.gid }}"
-            - name: CHOWN_HOME
-              value: 'yes'
+    - name: ray_worker
+      networking:
+        ports:
+          - name: ray_node_manager
+            public: false
+          - name: ray_object_manager
+            public: false
+      deployment:
+        strategy: workers_fill_pool_if_available
+      container:
+        image_name: ray
+        user: root
+        workdir: /work
+        mounts:
+          app_files:
+            - name: ray_worker
+              app_files_path: ray_worker
+              container_path: /ocean/etc/ray_worker
+              readonly: true
+          data_stores: "{{ engines.ray_worker.container.workdir }}"
+        command: "{{ engines.ray_worker.container.mounts.app_files.ray_worker.container_path }}/startup.sh"
+        env_vars:
+          - name: NB_UID
+            value: "{{ workspace.user.uid }}"
+          - name: NB_GID
+            value: "{{ workspace.user.gid }}"
+          - name: CHOWN_HOME
+            value: 'yes'
