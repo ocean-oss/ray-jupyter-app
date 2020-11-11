@@ -15,19 +15,20 @@ steps:
             value: "{{ engines.ray_jupyter.deployment.nodes.main.private_ip }}"
           - name: jupyter_token
             value: "{% generate_uuid %}"
-        ports:
-          - name: ray_head_port
-            public: false
-          - name: ray_dashboard_port
-            public: true
-          - name: ray_node_manager_port
-            public: false
-          - name: ray_object_manager_port
-            public: false
-          - name: gcs_server_port
-            public: false
-          - name: jupyter_port
-            public: true
+        networking:
+          ports:
+            - name: ray_head_port
+              public: false
+            - name: ray_dashboard_port
+              public: true
+            - name: ray_node_manager_port
+              public: false
+            - name: ray_object_manager_port
+              public: false
+            - name: gcs_server_port
+              public: false
+            - name: jupyter_port
+              public: true
         deployment:
           strategy: main
         container:
@@ -65,11 +66,12 @@ steps:
               url: "http://{{ engines.ray_jupyter.ui.buttons.self.node.public_ip }}:{{ engines.ray_jupyter.ports.jupyter_port.value }}?token={{ engines.ray_jupyter.vars.jupyter_token }}"
   - engines:
       - name: ray_worker
-        ports:
-          - name: ray_node_manager_port
-            public: false
-          - name: ray_object_manager_port
-            public: false
+        networking:
+          ports:
+            - name: ray_node_manager_port
+              public: false
+            - name: ray_object_manager_port
+              public: false
         deployment:
           strategy: workers_fill_pool_if_available
         container:
