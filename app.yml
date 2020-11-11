@@ -1,11 +1,12 @@
 ---
 ocean:
   version: "1"
-snapshots:
+images:
   - name: ray
     registry: docker_hub
     image: getocean/ray-notebook
     tag: latest
+    snapshottable: true
 steps:
   - engines:
       - name: ray_jupyter
@@ -26,35 +27,35 @@ steps:
             value: "{% reserve_public_port %}"
           - name: jupyter_token
             value: "{% generate_uuid %}"
-        orchestrator:
-          deployment_strategy: main
-          snapshot_name: ray
-          container:
-            user: root
-            workdir: /work
-            mounts:
-              app_files:
-                - name: ray_jupyter
-                  app_files_path: ray_jupyter
-                  container_path: /ocean/etc/ray_jupyter
-                  readonly: true
-              data_stores: "{{ engines.ray_jupyter.orchestrator.container.workdir }}"
-            command: "{{ engines.ray_jupyter.orchestrator.container.mounts.app_files.ray_jupyter.container_path }}/startup.sh"
-            env_vars:
-              - name: JUPYTER_ENABLE_LAB
-                value: "yes"
-              - name: NB_UID
-                value: "{{ workspace.user.uid }}"
-              - name: NB_GID
-                value: "{{ workspace.user.gid }}"
-              - name: CHOWN_HOME
-                value: "yes"
-              - name: GRANT_SUDO
-                value: "yes"
-              - name: RESTARTABLE
-                value: "yes"
-              - name: RAY_ADDRESS
-                value: "{{ engines.ray_jupyter.vars.ray_head_host }}:{{ engines.ray_jupyter.vars.ray_head_port }}"
+        deployment:
+          strategy: main
+        container:
+          image_name: ray
+          user: root
+          workdir: /work
+          mounts:
+            app_files:
+              - name: ray_jupyter
+                app_files_path: ray_jupyter
+                container_path: /ocean/etc/ray_jupyter
+                readonly: true
+            data_stores: "{{ engines.ray_jupyter.container.workdir }}"
+          command: "{{ engines.ray_jupyter.container.mounts.app_files.ray_jupyter.container_path }}/startup.sh"
+          env_vars:
+            - name: JUPYTER_ENABLE_LAB
+              value: "yes"
+            - name: NB_UID
+              value: "{{ workspace.user.uid }}"
+            - name: NB_GID
+              value: "{{ workspace.user.gid }}"
+            - name: CHOWN_HOME
+              value: "yes"
+            - name: GRANT_SUDO
+              value: "yes"
+            - name: RESTARTABLE
+              value: "yes"
+            - name: RAY_ADDRESS
+              value: "{{ engines.ray_jupyter.vars.ray_head_host }}:{{ engines.ray_jupyter.vars.ray_head_port }}"
         ui:
           buttons:
             - label: Ray Dashboard
@@ -70,24 +71,24 @@ steps:
             value: "{% reserve_private_port %}"
           - name: gcs_server_port
             value: "{% reserve_private_port %}"
-        orchestrator:
-          deployment_strategy: workers_fill_pool_if_available
-          snapshot_name: ray
-          container:
-            user: root
-            workdir: /work
-            mounts:
-              app_files:
-                - name: ray_worker
-                  app_files_path: ray_worker
-                  container_path: /ocean/etc/ray_worker
-                  readonly: true
-              data_stores: "{{ engines.ray_worker.orchestrator.container.workdir }}"
-            command: "{{ engines.ray_worker.orchestrator.container.mounts.app_files.ray_worker.container_path }}/startup.sh"
-            env_vars:
-              - name: NB_UID
-                value: "{{ workspace.user.uid }}"
-              - name: NB_GID
-                value: "{{ workspace.user.gid }}"
-              - name: CHOWN_HOME
-                value: 'yes'
+        deployment:
+          strategy: workers_fill_pool_if_available
+        container:
+          image_name: ray
+          user: root
+          workdir: /work
+          mounts:
+            app_files:
+              - name: ray_worker
+                app_files_path: ray_worker
+                container_path: /ocean/etc/ray_worker
+                readonly: true
+            data_stores: "{{ engines.ray_worker.container.workdir }}"
+          command: "{{ engines.ray_worker.container.mounts.app_files.ray_worker.container_path }}/startup.sh"
+          env_vars:
+            - name: NB_UID
+              value: "{{ workspace.user.uid }}"
+            - name: NB_GID
+              value: "{{ workspace.user.gid }}"
+            - name: CHOWN_HOME
+              value: 'yes'
