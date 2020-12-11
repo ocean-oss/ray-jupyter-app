@@ -6,7 +6,6 @@ images:
     registry: docker_hub
     image: getocean/ray-notebook
     tag: latest
-    snapshottable: true
 steps:
   - engines:
     - name: ray_jupyter
@@ -18,7 +17,7 @@ steps:
       settings:
         - name: mode
           label: Jupyter Mode
-          style: dropdown
+          type: dropdown
           default_value: 'lab'
           options:
             - value: lab
@@ -46,7 +45,9 @@ steps:
       deployment:
         strategy: main
       container:
-        image_name: ray
+        image:
+          name: ray
+          editable: true
         user: root
         workdir: "/home/{{ workspace.user.name }}"
         mounts:
@@ -93,7 +94,9 @@ steps:
       deployment:
         strategy: workers_fill_pool_if_available
       container:
-        image_name: ray
+        image:
+          name: ray
+          editable: true
         user: root
         workdir: /work
         mounts:
